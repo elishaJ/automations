@@ -112,10 +112,10 @@ for i in ${!sshuser[@]}; do
 	echo -e "\nPerforming task on server ${srvIP[$i]}"
 	ssh -i ~/.ssh/bulkops -o StrictHostKeyChecking=no ${sshuser[$i]}@${srvIP[$i]} 'bash -s' <<'EOF'	
         cd /home/master/;
-        touch ilsa.txt
+        # touch server.txt
 	for app in $(ls -l /home/master/applications/ | awk '/^d/ {print $NF}'); do
 		cd /home/master/applications/$app/public_html/;
-		touch ilsaIsStupid.txt
+		# touch app.txt
 		cd /home/master/applications/;
         done;
 EOF
