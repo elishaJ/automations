@@ -9,11 +9,11 @@ _reset=$(tput sgr0)
 dir=$(pwd)
 function _success()
 {
-        printf '%s�~\~T %s%s\n' "$_green" "$@" "$_reset"
+	printf '%s✔ %s%s\n' "$_green" "$@" "$_reset"
 }
 
 function _error() {
-    printf '%s�~\~V %s%s\n' "$_red" "$@" "$_reset"
+    printf '%s✖ %s%s\n' "$_red" "$@" "$_reset"
 }
 
 function _note()
