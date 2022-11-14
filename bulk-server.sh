@@ -1,4 +1,7 @@
 #!/bin/bash
+# Purpose: Debug server load
+# Author: Elisha | Cloudways
+
 _bold=$(tput bold)
 _underline=$(tput sgr 0 1)
 _red=$(tput setaf 1)
