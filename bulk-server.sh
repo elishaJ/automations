@@ -1,5 +1,5 @@
 #!/bin/bash
-# Purpose: Debug server load
+# Purpose: Automate tasks
 # Author: Elisha | Cloudways
 
 _bold=$(tput bold)
