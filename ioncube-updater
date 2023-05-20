@@ -1,0 +1,14 @@
+#!/bin/bash
+cd /tmp
+wget https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.zip;
+unzip ioncube_loaders_lin_x86-64.zip;
+cd ioncube;
+php_version=$(php -v | awk '/PHP/ {print $2}' | cut -d "." -f 1,2 | head -n 1)
+ext_dir=$(php -i | grep extension_dir | head -n 1 | cut -d " " -f 3);
+ini_file=$(ls /etc/php/$php_version/cli/conf.d/ | grep ioncube);
+sudo cp "ioncube_loader_lin_$php_version.so" "$ext_dir"
+echo "zend_extension=$ext_dir/ioncube_loader_lin_$php_version.so" > "/etc/php/$php_version/cli/conf.d/$ini_file"
+sudo /etc/init.d/nginx reload
+sudo /etc/init.d/php$php_version-fpm reload
+php -v;
+exit;
