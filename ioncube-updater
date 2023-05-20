@@ -11,4 +11,5 @@ echo "zend_extension=$ext_dir/ioncube_loader_lin_$php_version.so" > "/etc/php/$p
 sudo /etc/init.d/nginx reload
 sudo /etc/init.d/php$php_version-fpm reload
 php -v;
+rm -rf /tmp/ioncube*
 exit;
