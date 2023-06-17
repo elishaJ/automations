@@ -1,5 +1,6 @@
 #!/bin/bash
-cd /tmp
+mkdir /tmp/update_ioncube;
+cd /tmp/update_ioncube;
 wget https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.zip;
 unzip ioncube_loaders_lin_x86-64.zip;
 cd ioncube;
@@ -11,5 +12,5 @@ echo "zend_extension=$ext_dir/ioncube_loader_lin_$php_version.so" > "/etc/php/$p
 sudo /etc/init.d/nginx reload
 sudo /etc/init.d/php$php_version-fpm reload
 php -v;
-rm -rf /tmp/ioncube*
+rm -rf /tmp/update_ioncube*
 exit;
