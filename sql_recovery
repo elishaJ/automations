@@ -7,35 +7,40 @@ echo -e "Start Restoring Databases"
 echo -e "\nCheck MySQL status"
 /etc/init.d/mysql  status
 
-read -r -p "If MySQL is running press Y else N  [y/N] " response
-if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]
-
-then
+read -r -p "If MySQL is running press Y else N  [y/n] " response
+if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
 
 #   ********************************************** DUMP DATABASES *****************************************************
 
-#databases=`mysql -e "SHOW DATABASES;" | tr -d "| " | grep -v Database`
-databases=`mysql -BNe "SHOW DATABASES;" | grep -v -e 'information_schema\|performance_schema\|mysql'`
+databases=`mysql -BNe "SHOW DATABASES;" | grep -v -E 'information_schema|performance_schema|mysql'`
 
 #echo -e "Start Dumping Databases\n"
 
 for db in $databases; do
-    if  [[ "$db" != _* ]] ; then
+	if  [[ "$db" != _* ]] ; then
         echo "Dumping database: $db"
 	mysqldump  --databases $db > $db.sql
-    fi
     	if [ $? -ne 0 ]; then
-	echo $(tput setaf 1)Error: mysqldump failed for database: $db$(tput setaf 7)
-        exit 1
-    	fi
+		echo $(tput setaf 1)Error:$(tput setaf 7) mysqldump failed for database: $db;
+		echo "Fetching latest database backup of $db";
+		/var/cw/scripts/bash/duplicity_restore.sh --src $db -d --dst '/tmp/mysql-restore/'
+		if [ $? -ne 0 ]; then
+			echo $(tput setaf 1)Error:$(tput setaf 7) Failed to fetch backup of $db; 
+        		exit 1
+		else
+			cp /tmp/mysql-restore/mysql/*.sql "/tmp/mysql-restore/$db.sql"
+			rm -r /tmp/mysql-restore/mysql/
+    		fi
+	fi
+fi
 done
 
 #   ******************************************************************************************************************
 #   ********************************************** STOPPING SERVICES *************************************************
 #   ******************************************************************************************************************
 
-echo -e "\nStopping Monit"
-/etc/init.d/monit  stop
+echo -e "\nStopping MySQL monitoring"
+monit unmonitor mysql
 
 echo -e "\nStopping MySQL"
 /etc/init.d/mysql  stop
@@ -44,8 +49,8 @@ echo -e "\nStopping MySQL"
 
 echo -e "\nRemoving ibdata files"
 rm /var/lib/mysql/ib*
-ls /var/lib/mysql
-
+#ls /var/lib/mysql
+echo -e "\nDropping databases"
 #databases=`ls |   grep .sql  | cut -d'.' -f1`
 
 for db in $databases; do
@@ -55,17 +60,19 @@ for db in $databases; do
     fi
 done
 
-ls /var/lib/mysql
+#ls /var/lib/mysql
 
 #   ********************************************** STARTING SERVICES *************************************************
 
+cp /etc/mysql/conf.d/custom-manual.cnf /tmp/mysql-restore/custom-manual.cnf.bk
 echo -n "[mysqld]" > /etc/mysql/conf.d/custom-manual.cnf
 
 echo -e "\nStarting MySQL"
 /etc/init.d/mysql  start
 
-echo -e "\nStarting Monit"
-/etc/init.d/monit  start
+echo -e "\nStart Monitoring MySQL"
+#/etc/init.d/monit  start
+monit monitor mysql
 
 #   ********************************************** CREATING DATABASES ************************************************
 
@@ -88,7 +95,7 @@ for db in $databases; do
         	mysql $db < $db.sql
 	fi
 done
-echo -e "\nDatabase Restored Successfully"
+echo -e "\n$(tput setaf 2)Success: $(tput setaf 7)Database Restored Successfully"
 else
 	echo -e "\nOperation Cancelled"
 fi
