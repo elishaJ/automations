@@ -1,5 +1,9 @@
 #!/bin/bash
 php_version=$(php -v | awk '/PHP/ {print $2}' | cut -d "." -f 1,2 | head -n 1);
+if [ "$php_version" = "8.0" ]; then
+        echo $(tput setaf 1)Error: $(tput setaf 7)"IonCube isn't compatible with PHP v8.0 and there is no release for v8.0 yet."$'\n'Exiting...;
+        exit 1;
+else
 mkdir /tmp/update_ioncube;
 cd /tmp/update_ioncube;
 wget -q 'https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.zip';
@@ -16,4 +20,5 @@ sudo /etc/init.d/nginx reload;
 sudo /etc/init.d/php$php_version-fpm reload;
 php -v | grep -B 3 -P 'ionCube PHP Loader v\d+\.\d+\.\d+'
 rm -rf /tmp/update_ioncube*
+fi
 exit;
