@@ -1,0 +1,13 @@
+**/storage/logs/*
+**/var/cache/*
+**/var/locks/*
+**/var/log/*
+**/var/page_cache/*
+**/var/session/*
+**/var/sessions/*
+**/var/tmp/*
+**/.git/*
+**/var/report/*
+**/wp-content/cache/*
+**/wp-content/debug.log
+**/cache/*
